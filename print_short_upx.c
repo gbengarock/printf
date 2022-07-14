@@ -1,30 +1,49 @@
 #include "main.h"
 
 /**
- * prinhunt - prints a short unsigned integer
- * @arguments: number to print
+ * prinhupx - prints a short decimal in hexadecimal
+ * @arguments: The character to print
  * @buf: buffer pointer
  * @ibuf: index for buffer pointer
- * Return: number of chars printed.
+ * Return: number of chars printed
  */
-int prinhunt(va_list arguments, char *buf, unsigned int ibuf)
+int prinhupx(va_list arguments, char *buf, unsigned int ibuf)
 {
-	unsigned short int int_in, int_temp, i, div;
+	short int int_input, i, isnegative, count, first_digit;
+	char *hexadecimal, *binary;
 
-	int_in = va_arg(arguments, unsigned int);
+	int_input = va_arg(arguments, int);
+	isnegative = 0;
 
-	int_temp = int_in;
-	div = 1;
-
-	while (int_temp > 9)
+	if (int_input == 0)
 	{
-		div *= 10;
-		int_temp /= 10;
+		ibuf = handl_buf(buf, '0', ibuf);
+		return (1);
+	}
+	if (int_input < 0)
+	{
+		int_input = (int_input * -1) - 1;
+		isnegative = 1;
 	}
 
-	for (i = 0; div > 0; div /= 10, i++)
+	binary = malloc(sizeof(char) * (16 + 1));
+	binary = fill_binary_array(binary, int_input, isnegative, 16);
+	hexadecimal = malloc(sizeof(char) * (4 + 1));
+	hexadecimal = fill_hex_array(binary, hexadecimal, 1, 4);
+
+	for (first_digit = i = count = 0; hexadecimal[i]; i++)
 	{
-		ibuf = handl_buf(buf, ((int_in / div) % 10) + '0', ibuf);
+		if (hexadecimal[i] != '0' && first_digit == 0)
+			first_digit = 1;
+		if (first_digit)
+		{
+			ibuf = handl_buf(buf, hexadecimal[i], ibuf);
+			count++;
+		}
 	}
-	return (i);
+
+	free(binary);
+	free(hexadecimal);
+
+	return (count);
 }
